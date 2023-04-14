@@ -1,5 +1,5 @@
 ---
-title: "International migration"
+title: "International migration's effects on labor market"
 author: 
   - Arstanova Alize[^1]
 bibliography: ../bibliography/biblio.bib
@@ -32,24 +32,34 @@ knitr::opts_chunk$set(cache = FALSE, echo = TRUE, message = FALSE, warning = FAL
 <!-- ======================================================================= -->
 <!-- ============================== FOOTNOTES ============================== -->
 <!-- ======================================================================= -->
-[^1]: 21080629
+[^1]:21080629, [Github Repo](https://github.com/AlizeArstanova/Midterm.git) 
 
 # Introduction
-This outline has been created to assist you in writing your project assignment. You should cite all the sources you use, articles, presentations, projects, etc. Quoting and referencing gives readers the opportunity to access the resources you refer. **Even though you use your own words, if you are conveying the ideas of others in your work, you have to document the source of these ideas. Otherwise, you are committing academic plagiarism.** For example, you can refer to @aydinonat:2007 for academic writing rules. You can find lots of online resources on this topic.
+An estimated 281 million people, approximately 3.6% of the world’s population, currently live outside their country of origin. An increasing number of persons leave their homes for a complex combination of reasons; however, the most common and obvious one is for the labor markets. A majority of immigrants come from developing states due to government incompetence, economic instability and limited opportunities to earn money. Therefore, migration is one of the ways to escape poverty and improve the financial status of households. 
 
-The sections in your project assignment should definitely include the sections in this text. Apart from the sections used here, you can use different subsections. When writing your project, use this file as a draft and adapt its content to your purposes.
+Nowadays, academic researchers study the economic gains of this phenomenon, such as a rise in productivity and contribution to taxes. Migrants increase potential output both in their original countries by sending remittances and in host countries by enlarging the size of the labor force and creating demand. At the same time, much of the policy debate surrounding immigration deals with the possibility that immigrants “take jobs away” from native workers and perhaps hamper the economic progress of some groups in the receiving states [@borjas1989economic]. In the early 2000s, Canada and Australia, whose economies were greatly influenced and shaped by international migration, held discussions regarding immigration and unemployment because the public and some policy-makers believed that foreign workers were responsible for low employment. In addition, among several theoretical models that try to explain why international migration begins, two of them - "Dual labor market" and "Cumulative causation" - claim that immigration leads to higher unemployment. 
 
-In this section, mention the purpose and importance of your work in a few paragraphs.
+However, there is no generally accepted opinion on the direction and degree of impact of international migration on unemployment. In the literature, there are studies that have concluded that migration has a positive effect on unemployment, as well as studies that have found a negative relationship between them [@kilic2019relationship]. 
+
+Accordingly, this work is primarily focused on defining whether there is a correlation between international migration and unemployment or not. The results are expected to show no correlation or a negative correlation because plenty of studies have stated that immigration positively affects productivity (high productivity means high employment). Hence, I will also examine a correlation between net migration value and GDP as a supportive element to my first question to draw a more accurate conclusion. 
+ 
+
+**Data**
+
+The observations are represented by countries from different continents, and the variables are represented by the real GDP rate, net migration values and unemployment rate. The period is 1991-2021, and the data sources used in this paper are taken from International Labor Organization, United Nations Children’s Fund data and the World Bank. 
+
+
 
 ## Literature Review
+The literature regarding the effects of international migration follows various strands. Some of them attempt to describe the migrations’ initiation and consequences through theoretical models without any factual evidence. Other studies are heavily based on empirical information within a theoretical framework. 
 
-In this section, discuss the articles you have read on the subject by giving references. This is a narrative citation @chang:2013. This one is a parenthetical citation [@chang:2013]. **Do not summarize each article individually under a separate title.** In the literature review section, **at least six** articles must be cited [@newbold:2003; @verzani:2014; @wickham:2014; @wooldridge:2015a].
+Firstly, I reviewed all the theories concerning the topic to obtain a general idea of what might be affected by migration and what outcomes it might lead to. @massey1993theories investigated a fragmented set of theories that had developed largely in isolation from one another. As a result, proposed models employ different concepts, various assumptions and frames of reference to explain why international migration begins and continues. For instance, neoclassical economics conceives of movement as an individual decision for income maximization, while dual labor market theory generally ignores micro-level processes, focusing instead on forces operating at much higher levels of aggregation.
 
+Nevertheless, we need empirical data and statistical analysis to establish a clear link between emigration and presumed issues such as unemployment or benefits, namely GDP growth. 
 
+One of the most popular studies about the impact of international migration on labor markets in Canada was conducted by @islam2007immigration. He covered the period of 1961-2002, and his results were as follows: the causality tests indicated no relationship between migration and unemployment, and the cointegration test showed that there was no increase in total unemployment due to migration. @kilic2019relationship examined the effects of immigration on unemployment in 23 OECD countries selected between 2000 and 2015 by using the panel data analysis method. According to the findings, migration was observed to have a negative effect. @gundougmucs2021effect used panel regression analysis and concluded that international migration had no statistically significant effect on unemployment in 27 European states between 2000-2017. Moreover, increases in GDP, public expenditures, education expenditures and wage rises result in employment growth. In contrast, @edo2015impact used micro-level data to reveal the influence of international migration on the French labor market and claimed that it had negative effects on employment. 
 
-**References section is created automatically by Rmarkdown. There is no need to change the references section in the draft file.**
-
-**_You shouldn't delete the last 3 lines. Those lines are required for References section._**
+Two studies by @taylor1996international discussed direct and indirect ways by which migration is able to increase productivity in both sending and receiving countries. @simionescu2016gdp analyzed the relationship between the GDP and the net migration using the comparative approach represented by the panel data and Bayesian analysis for the period 1991-2013 in Central and Eastern European states. A negative correlation was recorded between net migration and the real GDP. 
 
 \newpage
 # References {#references}
