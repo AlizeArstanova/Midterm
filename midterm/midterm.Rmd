@@ -61,7 +61,52 @@ One of the most popular studies about the impact of international migration on l
 
 Two studies by @taylor1996international discussed direct and indirect ways by which migration is able to increase productivity in both sending and receiving countries. @simionescu2016gdp analyzed the relationship between the GDP and the net migration using the comparative approach represented by the panel data and Bayesian analysis for the period 1991-2013 in Central and Eastern European states. A negative correlation was recorded between net migration and the real GDP. 
 
+
+
+### Data Set
+```
+
 \newpage
 # References {#references}
 <div id="refs"></div>
+
+```{r}
+unemployment_data <- read_csv("../data/unemployment.csv") %>%
+  select(-Source) %>% 
+  rename("Country" = "Reference area") %>% 
+  select(-"Female_15-24", -"Female_25+", -"Male_15-24", -"Male_25+", -"Total_15-24",-"Total_25+") %>% 
+  rename(Year = "Year")
+```
+```{r}
+GDP_and_GNI_data <- read_csv("../data/GDP and GNI.csv") %>% 
+  select(-"Series Code", -"Country Code") %>% 
+  relocate("Country Name", .before = "Series Name") %>%
+  pivot_longer(c("1991 [YR1991]" : "2021 [YR2021]"),
+             names_to = "Year") %>% 
+  pivot_wider(names_from = "Series Name",
+              values_from = "value") %>% 
+  select(-"NA", -"Data from database: World Development Indicators", -"Last Updated: 03/01/2023") %>%
+    rename("Country" = "Country Name") %>% 
+  separate_wider_delim(Year, delim = "[", names = c("Year", "ye")) %>% 
+  select(-"ye")
+```
+```{r}
+international_migration_data <- read_csv("../data/international migration.csv") %>% 
+  rename("Country" = "REF_AREA:Geographic area",
+         "Residence" = "RESIDENCE:Residence",
+         "Sex" = "SEX:Sex", 
+         "Age" = "AGE:Current age",
+         "Year" = "TIME_PERIOD:Time period",
+         "Net migration rate (per 1,000 population)" = "OBS_VALUE:Observation Value") %>% 
+  relocate("Country", .before = "DATAFLOW") %>% 
+  select(-("UNIT_MEASURE:Unit of measure" : "OBS_FOOTNOTE:Observation footnote")) %>% 
+  select(-"DATAFLOW", -"INDICATOR:Indicator") %>% 
+  relocate("Year", .before = "Residence") %>% 
+  relocate("Net migration rate (per 1,000 population)", .before = "Residence") %>% 
+  separate_wider_delim(Country, delim = ":", names = c("countryc", "Country")) %>% 
+  select(-"countryc")
+```
+
+
+
 
