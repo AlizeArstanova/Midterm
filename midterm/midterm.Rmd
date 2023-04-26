@@ -63,19 +63,26 @@ Two studies by @taylor1996international discussed direct and indirect ways by wh
 
 
 
-### Data Set
+### Data set
+```{r}
+library(tidyverse)
+data_set <- inner_join(GDP_and_GNI_data, unemployment_data) %>%
+  inner_join(international_migration_data)
 ```
 
-\newpage
-# References {#references}
-<div id="refs"></div>
+
+
+
 
 ```{r}
+library(tidyverse)
 unemployment_data <- read_csv("../data/unemployment.csv") %>%
   select(-Source) %>% 
   rename("Country" = "Reference area") %>% 
   select(-"Female_15-24", -"Female_25+", -"Male_15-24", -"Male_25+", -"Total_15-24",-"Total_25+") %>% 
-  rename(Year = "Year")
+  rename(Year = "Year") %>% 
+  transform("Year" = as.numeric(Year)) %>% 
+  arrange("Country")
 ```
 ```{r}
 GDP_and_GNI_data <- read_csv("../data/GDP and GNI.csv") %>% 
@@ -88,7 +95,10 @@ GDP_and_GNI_data <- read_csv("../data/GDP and GNI.csv") %>%
   select(-"NA", -"Data from database: World Development Indicators", -"Last Updated: 03/01/2023") %>%
     rename("Country" = "Country Name") %>% 
   separate_wider_delim(Year, delim = "[", names = c("Year", "ye")) %>% 
-  select(-"ye")
+  select(-"ye") %>% 
+  na.omit() %>% 
+  transform("Year" = as.numeric(Year)) %>% 
+  arrange("Country")
 ```
 ```{r}
 international_migration_data <- read_csv("../data/international migration.csv") %>% 
@@ -104,9 +114,15 @@ international_migration_data <- read_csv("../data/international migration.csv") 
   relocate("Year", .before = "Residence") %>% 
   relocate("Net migration rate (per 1,000 population)", .before = "Residence") %>% 
   separate_wider_delim(Country, delim = ":", names = c("countryc", "Country")) %>% 
-  select(-"countryc")
+  select(-"countryc", -"Residence", -"Sex", -"Age") %>% 
+  rename("Net migration" = "Net migration rate (per 1,000 population)") 
 ```
 
 
+
+
+\newpage
+# References {#references}
+<div id="refs"></div>
 
 
