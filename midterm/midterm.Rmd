@@ -63,60 +63,127 @@ Two studies by @taylor1996international discussed direct and indirect ways by wh
 
 
 
-### Data set
-```{r}
+# Data set
+```{r import-data-join, echo=FALSE, warning=FALSE, message=FALSE}
 library(tidyverse)
-data_set <- inner_join(GDP_and_GNI_data, unemployment_data) %>%
-  inner_join(international_migration_data)
-```
+library(here)
 
-
-
-
-
-```{r}
-library(tidyverse)
-unemployment_data <- read_csv("../data/unemployment.csv") %>%
-  select(-Source) %>% 
+unemployment <- read_csv(here("data/unemployment.csv")) %>%
   rename("Country" = "Reference area") %>% 
-  select(-"Female_15-24", -"Female_25+", -"Male_15-24", -"Male_25+", -"Total_15-24",-"Total_25+") %>% 
-  rename(Year = "Year") %>% 
-  transform("Year" = as.numeric(Year)) %>% 
-  arrange("Country")
+  select(-Source, -"Female_15-24", -"Female_25+", -"Male_15-24", -"Male_25+", -"Total_15-24",-"Total_25+") %>% 
+  janitor::clean_names() %>% 
+  rename("female_unemployment_rate" = "female_15",
+         "male_unemplyment_rate" = "male_15",
+         "total_unemployment_rate" = "total_15")
+
+gdp <- read_csv(here("data/GDP and GNI.csv")) %>% 
+  janitor::clean_names() %>% 
+  rename_with(~stringr::str_remove_all(.x, pattern = "x[0-9]+_")) %>% 
+  pivot_longer(starts_with("yr"),
+               names_to = "year",
+               values_to = "value") %>% 
+  drop_na(series_code) %>% 
+  select(-series_code, -country_code) %>% 
+  pivot_wider(names_from = series_name,
+              values_from = value) %>% 
+  mutate(year = as.numeric(stringr::str_remove_all(year, "yr"))) %>% 
+  set_names(c("country", "year", "gdp_growth", "gni_growth", "gni_pc", "gdp_pc")) %>% 
+  mutate(across(gdp_growth:gdp_pc, as.numeric)) %>% 
+  rename("gdp_growth_rate" = "gdp_growth",
+         "gdp_per_capita" = "gdp_pc",
+         "gni_growth_rate" = "gni_growth",
+         "gni_per_capita" = "gni_pc")
+
+
+migration <- read_csv(here("data/international migration.csv")) %>% 
+  janitor::clean_names() %>% 
+  select(ref_area_geographic_area, time_period_time_period, obs_value_observation_value) %>% 
+  set_names(c("country", "year", "migration")) %>% 
+  separate_wider_delim(country, delim = ": ", names = c("drop_me", "country")) %>% 
+  select(-drop_me) %>% 
+  rename("migration_rate" = "migration")
+
+
+data_set <- inner_join(gdp, unemployment) %>%
+  inner_join(migration)
 ```
+
+This study endeavors to find a correlation between migration and unemployment in 17 selected countries that have different levels of income and are from various continents. The analysis covers the period of 1991-2021 and uses annual data. Figures belonging to the study are obtained from three different sources. International migration data is taken from United Nations Children’s Fund data, the unemployment rate from the Labor Organization, and economic growth from the World Bank database. 
+
+The net migration rate is expressed as the difference between the number of immigrants and the number of emigrants (people leaving an area) divided by the population in a given year. The unemployment rate shows the share of workers in the labor force who do not currently have a job but are actively looking for work in a particular year. Economic growth is represented by nominal GDP, which measures the monetary value (USD) of final goods and services produced in a country in a given period of time, and by annual GDP growth rate, which compares the year-over-year change in a country's economic output. 
+
+```{r, results='asis', echo=FALSE}
+data_set %>% 
+  select(-country) %>% 
+  summarytools::descr(stats = c("mean", "sd", "min", "med", "max"), transpose = TRUE) %>% 
+  xtable::xtable(caption = "Summary Statistics",
+         label = "tab:summary",
+         align = c("l", "c", "c", "c", "c", "c")) %>% 
+  print(booktabs = TRUE, comment = FALSE, caption.placement = "top")
+```
+
+The model was estimated with 527 observations. Table 1 shows descriptive statistics for variables.  According to the summary statistics, while the average total unemployment rate was 6.74, the lowest and highest unemployment rates were 0.60 and 27.50 in the sample, respectively. The average migration rate variable was 0.62. This series indicated the highest migration rate at 17.36 and the lowest one at -35.72. The GDP per capita variable had an average of USD 12796.36 in the period discussed. In addition, the highest GDP growth rate was 15.33 and the lowest one was -36.39, with an average rate of 3.54.
+
+# Data Analysis
 ```{r}
-GDP_and_GNI_data <- read_csv("../data/GDP and GNI.csv") %>% 
-  select(-"Series Code", -"Country Code") %>% 
-  relocate("Country Name", .before = "Series Name") %>%
-  pivot_longer(c("1991 [YR1991]" : "2021 [YR2021]"),
-             names_to = "Year") %>% 
-  pivot_wider(names_from = "Series Name",
-              values_from = "value") %>% 
-  select(-"NA", -"Data from database: World Development Indicators", -"Last Updated: 03/01/2023") %>%
-    rename("Country" = "Country Name") %>% 
-  separate_wider_delim(Year, delim = "[", names = c("Year", "ye")) %>% 
-  select(-"ye") %>% 
-  na.omit() %>% 
-  transform("Year" = as.numeric(Year)) %>% 
-  arrange("Country")
+library(ggplot2)
+library(dplyr)
+library(hrbrthemes)
+library(ggh4x)
+data_set %>%
+  filter(country == c("Argentina", "Australia", "Belarus", "Uganda", "Canada", "Japan")) %>% 
+  ggplot() +
+  aes(year) +
+  geom_line(aes(y = migration_rate, color = "migration rate")) +
+  geom_line(aes(y = total_unemployment_rate, color = "unemployment rate")) +
+  labs(x = "year",
+       y = "rate",
+       title = "Migration and unemployment rates") +
+  theme_ipsum_rc() +
+  facet_wrap(vars(country))
 ```
-```{r}
-international_migration_data <- read_csv("../data/international migration.csv") %>% 
-  rename("Country" = "REF_AREA:Geographic area",
-         "Residence" = "RESIDENCE:Residence",
-         "Sex" = "SEX:Sex", 
-         "Age" = "AGE:Current age",
-         "Year" = "TIME_PERIOD:Time period",
-         "Net migration rate (per 1,000 population)" = "OBS_VALUE:Observation Value") %>% 
-  relocate("Country", .before = "DATAFLOW") %>% 
-  select(-("UNIT_MEASURE:Unit of measure" : "OBS_FOOTNOTE:Observation footnote")) %>% 
-  select(-"DATAFLOW", -"INDICATOR:Indicator") %>% 
-  relocate("Year", .before = "Residence") %>% 
-  relocate("Net migration rate (per 1,000 population)", .before = "Residence") %>% 
-  separate_wider_delim(Country, delim = ":", names = c("countryc", "Country")) %>% 
-  select(-"countryc", -"Residence", -"Sex", -"Age") %>% 
-  rename("Net migration" = "Net migration rate (per 1,000 population)") 
-```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
