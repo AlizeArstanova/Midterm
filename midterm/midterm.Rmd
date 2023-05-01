@@ -13,8 +13,8 @@ header-includes:
 output:
   bookdown::pdf_document2:
     fig_caption: yes
-    fig_height: 3
-    fig_width: 4
+    fig_height: 5
+    fig_width: 8
     keep_tex: no
     latex_engine: xelatex
     number_sections: yes
@@ -26,7 +26,8 @@ fontsize: 12pt
 biblio-style: apalike
 ---
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(cache = FALSE, echo = TRUE, message = FALSE, warning = FALSE)
+knitr::opts_chunk$set(cache = FALSE, echo = FALSE, message = FALSE, warning = FALSE)
+
 ```
 
 <!-- ======================================================================= -->
@@ -65,8 +66,15 @@ Two studies by @taylor1996international discussed direct and indirect ways by wh
 
 # Data set
 ```{r import-data-join, echo=FALSE, warning=FALSE, message=FALSE}
+# Make your all library calls here. Once you call a library here
+# you don't need to call them again in the chunks below.
 library(tidyverse)
 library(here)
+
+# hrbrthemes doesn't behave well with pdf output.
+# Don't use it
+# library(hrbrthemes)
+
 
 unemployment <- read_csv(here("data/unemployment.csv")) %>%
   rename("Country" = "Reference area") %>% 
@@ -112,7 +120,7 @@ This study endeavors to find a correlation between migration and unemployment in
 
 The net migration rate is expressed as the difference between the number of immigrants and the number of emigrants (people leaving an area) divided by the population in a given year. The unemployment rate shows the share of workers in the labor force who do not currently have a job but are actively looking for work in a particular year. Economic growth is represented by nominal GDP, which measures the monetary value (USD) of final goods and services produced in a country in a given period of time, and by annual GDP growth rate, which compares the year-over-year change in a country's economic output. 
 
-```{r, results='asis', echo=FALSE}
+```{r summary, results='asis'}
 data_set %>% 
   select(-country) %>% 
   summarytools::descr(stats = c("mean", "sd", "min", "med", "max"), transpose = TRUE) %>% 
@@ -122,25 +130,23 @@ data_set %>%
   print(booktabs = TRUE, comment = FALSE, caption.placement = "top")
 ```
 
-The model was estimated with 527 observations. Table 1 shows descriptive statistics for variables.  According to the summary statistics, while the average total unemployment rate was 6.74, the lowest and highest unemployment rates were 0.60 and 27.50 in the sample, respectively. The average migration rate variable was 0.62. This series indicated the highest migration rate at 17.36 and the lowest one at -35.72. The GDP per capita variable had an average of USD 12796.36 in the period discussed. In addition, the highest GDP growth rate was 15.33 and the lowest one was -36.39, with an average rate of 3.54.
+The model was estimated with 527 observations. Table \@ref(tab:summary) shows descriptive statistics for variables.  According to the summary statistics, while the average total unemployment rate was 6.74, the lowest and highest unemployment rates were 0.60 and 27.50 in the sample, respectively. The average migration rate variable was 0.62. This series indicated the highest migration rate at 17.36 and the lowest one at -35.72. The GDP per capita variable had an average of USD 12796.36 in the period discussed. In addition, the highest GDP growth rate was 15.33 and the lowest one was -36.39, with an average rate of 3.54.
 
 # Data Analysis
-```{r}
-library(ggplot2)
-library(dplyr)
-library(hrbrthemes)
-library(ggh4x)
+```{r, fig.align='center', fig.cap='my awesome plot'}
 data_set %>%
-  filter(country == c("Argentina", "Australia", "Belarus", "Uganda", "Canada", "Japan")) %>% 
+  filter(country %in% c("Argentina", "Australia", "Belarus", "Uganda", "Canada", "Japan")) %>% 
   ggplot() +
   aes(year) +
-  geom_line(aes(y = migration_rate, color = "migration rate")) +
-  geom_line(aes(y = total_unemployment_rate, color = "unemployment rate")) +
-  labs(x = "year",
-       y = "rate",
-       title = "Migration and unemployment rates") +
-  theme_ipsum_rc() +
-  facet_wrap(vars(country))
+  geom_line(aes(y = migration_rate, color = "Migration Rate")) +
+  geom_line(aes(y = total_unemployment_rate, color = "Unemployment Rate")) +
+  labs(x = "Year",
+       y = "Rate",
+       title = "Migration and unemployment rates",
+       color = "") +
+  facet_wrap(vars(country)) +
+  theme_minimal() + # use ggplot's minimal theme
+  theme(legend.position = "bottom")
 ```
 
 
