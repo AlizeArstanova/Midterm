@@ -251,7 +251,8 @@ data_set %>%
                   p.adjust.method = "bonferroni") %>% 
   kbl(caption = "Recreating Style Table") %>%
   kable_classic(html_font = "Alrai")
-knitr::kable(iris2, format = "latex", booktabs = TRUE) 
+knitr::kable(iris2, format = "latex", booktabs = TRUE)
+
 ```
 
 
