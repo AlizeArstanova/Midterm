@@ -111,7 +111,7 @@ migration <- read_csv(here("data/international migration.csv")) %>%
   select(-drop_me) %>% 
   rename("migration_rate" = "migration")
 
-
+ 
 data_set <- inner_join(gdp, unemployment) %>%
   inner_join(migration)
 ```
@@ -127,7 +127,7 @@ data_set %>%
   xtable::xtable(caption = "Summary Statistics",
          label = "tab:summary",
          align = c("l", "c", "c", "c", "c", "c")) %>% 
-  print(booktabs = TRUE, comment = FALSE, caption.placement = "top")
+  print(booktabs = TRUE, comment = FALSE, caption.placement = "top") 
 ```
 
 The model was estimated with 527 observations. Table \@ref(tab:summary) shows descriptive statistics for variables.  According to the summary statistics, while the average total unemployment rate was 6.74, the lowest and highest unemployment rates were 0.60 and 27.50 in the sample, respectively. The average migration rate variable was 0.62. This series indicated the highest migration rate at 17.36 and the lowest one at -35.72. The GDP per capita variable had an average of USD 12796.36 in the period discussed. In addition, the highest GDP growth rate was 15.33 and the lowest one was -36.39, with an average rate of 3.54.
@@ -146,7 +146,7 @@ data_set %>%
        color = "") +
   facet_wrap(vars(country)) +
   theme_minimal() + # use ggplot's minimal theme
-  theme(legend.position = "bottom")
+  theme(legend.position = "bottom") 
 ```
 
 Figure \@ref(fig:rate) displays migration and unemployment rate in 6 countries around the world over the period of 1991-2021. From Figure \@ref(fig:rate) we can observe that Australia and Canada have experienced overall declining unemployment with some fluctuations since the 1990s. The unemployment rate in another high-income country, Japan, and low-income Uganda fluctuated between 2% and 6% for a given period. Upper middle-income states had a relatively high unemployment rate in the mid-1990s, but it fell years later. As mentioned before, Canada's and Australia's economies were shaped by international migration, and, as evidence, we can see a slight increase over time in migration with some expansion and contraction levels for both countries. Belarus and Argentina had low migration values, close to zero, which is expected for developing nations because people prefer to move to wealthier ones. Japan had low value as well, but it was mostly related to limited cultural assimilation and the integration of foreigners into society, not to economic issues. Uganda, which is considered to be a least developed state, had a negative migration rate for most of the period, which is explainable as people left for better job opportunities. So far, looking at graphics, we can not establish any relationship between net migration value and unemployment rate.     
@@ -164,22 +164,37 @@ data_set %>%
        color = "") +
   facet_wrap(vars(country)) +
   theme_minimal() + # use ggplot's minimal theme
-  theme(legend.position = "bottom")
+  theme(legend.position = "bottom") 
 ```
 The second question raised in this paper is whether there is a correlation between migration and GDP. A positive correlation between them would be a useful element to support the first question in case we get a negative correlation between migration and unemployment and vice versa. Because, for example, if increasing immigration boosts production levels, then expanded production improves employment. However, according to Figure \@ref(fig:gdp), not every state's high immigration rate leads to the labour market's enlargement. Figure \@ref(fig:gdp) illustrates that positive migration values had almost no impact on the Argentinian, Belarusian and Japanese  economies. To this list, we can also add Uganda, which showed positive patterns between net migration and GDP growth only in 1998-2003 and 2014-2021. In contrast, Canada and Australia indicated generally positive relationships between immigration and GDP, except for 2008-2009, when there was a huge economic crisis.
 
 ## Methodology
 First of all, we compared the means of migration with the help of Pairwise testing in 6 countries chosen for the data analysis section. Secondly, this study endeavored to analyze the relationship between migration and unemployment in 17 states through the Pearson correlation coefficient (r). It is the most common way of measuring a linear correlation. It is a number between –1 and 1 that measures the strength and direction of the relationship between two variables. However, in order to use it, we needed to check if the covariation was linear and if the data from each of the two variables (x,y) followed a normal distribution. If the data do not follow a normal distribution, another type of analysis is suggested.
 
-### Findings
-We created a scatter plot to show a positive linear relationship between two quantitative variables measured for the same individuals. Then we ran the Shapiro-Wilk test for normality. The null hypothesis was that "data are normally distributed". Our p-value was less than 2.2e-16, meaning less than 0.05, so we rejected our null hypothesis. We repeated the same steps for migration and GDP and obtained a negative linear relationship between them. Since our data were not normally distributed, we were not able to use the Pearson correlation test. However, because we had already defined linear relationships, we decided to focus on linear regression analysis. Simple linear regression is a regression model that estimates the relationship between one independent variable and one dependent variable using a straight line. We took the migration rate as an independent variable and unemployment and GDP rate as dependent variables. The regression used ordinary least-squares (OLS) algorithm to fit the linear model:
+## Findings
 
-$$
-y_i = \beta_0 + \beta_1x_i + \varepsilon_i
-$$
-where $\beta_0$ and $\beta_1$ are the regression coefficients and $\varepsilon_i$ are the error terms.
+### Pairwise Test
+Pairwise comparison is a method for analyzing multiple population means in pairs to determine whether they are significantly different from one another. Table \@ref(tab:means) displays the results of pairwise testing. We got a p-value greater than or equal to 0.05 only in 2 cases, other comparisons indicated statistical significance. Not to mention, we obtained extremely significant value in 9 cases out of 15. When a result is identified as being statistically significant, this means that you are confident that there is a real difference or relationship between two variables, and it’s unlikely that it’s a one-off occurrence.
 
-```{r, echo = FALSE, fig.show = 'hide'}
+```{r means, eval=TRUE, results='asis'}
+library(knitr)
+library(rstatix)
+library(kableExtra)
+library(devtools)
+options(knitr.table.format = "html")
+data_set %>% 
+  filter(country %in% c("Argentina", "Australia", "Belarus", "Uganda", "Canada", "Japan")) %>% 
+  pairwise_t_test(migration_rate ~ country, 
+                  pool.sd = FALSE,
+                  p.adjust.method = "bonferroni") %>% 
+  kbl(caption = "Pairwise test") %>%
+  kable_styling(bootstrap_options = "striped", font_size = 10)
+```
+
+### Shapiro-Wilk test
+Next, we created a scatter plot to show a positive linear relationship between migration and unemployment rate measured for the same individuals(Figure \@ref(fig:unemployment)). Then we ran the Shapiro-Wilk test for normality. The null hypothesis was that "data are normally distributed". Our p-value was less than 2.2e-16, meaning less than 0.05, so we rejected our null hypothesis. We repeated the same steps for migration and GDP and obtained a negative linear relationship between them(Figure \@ref(fig:gdp2)) along with p-value was less than 2.2e-16. Since our data had not been normally distributed, we were not able to use the Pearson correlation test.
+
+```{r unemployment, echo = FALSE, fig.show = 'asis', fig.cap='A positive linear relationship'}
 library("ggpubr")
 ggscatter(data_set,
           x = "migration_rate",
@@ -191,13 +206,14 @@ ggscatter(data_set,
           cor.coef = TRUE,
           cor.coef.coord = c(5,25),
           cor.method = "pearson",
-          ggtheme = theme_minimal())
+          ggtheme = theme_minimal()) 
 ```
 ```{r, echo = FALSE, results = 'hide'}
 shapiro.test(data_set$total_unemployment_rate)
 shapiro.test(data_set$migration_rate)
 ```
-```{r, echo = FALSE, fig.show = 'hide'}
+
+```{r gdp2, echo = FALSE, fig.show = 'asis', fig.cap='A negative linear relationship' }
 library("ggpubr")
 ggscatter(data_set,
           x = "migration_rate",
@@ -212,55 +228,72 @@ ggscatter(data_set,
           ggtheme = theme_minimal())
 
 ```
-```{r, eval=FALSE, results='asis'}
-shapiro.test(data_set$gdp_growth_rate) %>%  
-shapiro.test(data_set$migration_rate) %>% 
+```{r, echo = FALSE, results='hide'}
+shapiro.test(data_set$gdp_growth_rate) 
+shapiro.test(data_set$migration_rate)
 ```
 
-```{r,  echo = FALSE, fig.show = 'hide'}
+### Simple linear regression
+Because we had already defined linear relationships, we decided to focus on linear regression analysis. Simple linear regression is a regression model that estimates the relationship between one independent variable and one dependent variable using a straight line. We took the migration rate as an independent variable and unemployment and GDP rate as dependent variables. The regression used ordinary least-squares (OLS) algorithm to fit the linear model:
+$$
+y_i = \beta_0 + \beta_1x_i + \varepsilon_i
+$$
+where $\beta_0$ and $\beta_1$ are the regression coefficients and $\varepsilon_i$ are the error terms.
+
+Figure \@ref(fig:graphic) illustrates linear regression analysis, and Table \@ref(tab:regression) shows the results of the Ordinary Least Squares Regression. Our null and alternative hypotheses for $\beta_0$ and $\beta_1$ are:
+$$
+H_0: \beta_0 = 0 \quad
+H_A: \beta_0 \neq 0
+$$
+$$ 
+H_0: \beta_1 = 0 \quad
+H_A: \beta_1 \neq 0
+$$
+Based on the p-value we reject null hypothesis, and estimate coefficient of intercept is statistically different than zero and significant. Similarly, estimate coefficient for migration rate data is statistically significant. Our dependent variable in the regression is unemployment rate, so if migration rate increases one unit, it will increase unemployment rate by 0.02 units. If migration rate is 0, unemployment rate equals to 6.74. 
+
+```{r, results='hide'}
+score_mod <- lm(total_unemployment_rate ~ migration_rate, data = data_set)
+summary(score_mod)
+
+```
+
+```{r regression, eval=TRUE, results='asis'}
+library(knitr)
+library(rstatix)
+library(kableExtra)
+library(devtools)
+options(knitr.table.format = "html")
+tidy(score_mod) %>% 
+  kbl(caption = "Simple linear regression") %>%
+  kable_styling(bootstrap_options = "striped", font_size = 13)
+  
+```
+```{r graphic,  echo = FALSE, fig.show = 'asis', fig.cap='linear regression'}
 data_set %>% 
   ggplot(aes(migration_rate, total_unemployment_rate)) +
   geom_point() +
   geom_smooth(method = "lm") +
-  theme_minimal()
+  theme_minimal() 
+
 ```
-```{r, results='hide'}
-score_mod <- lm(total_unemployment_rate ~ migration_rate, data = data_set)
-summary(score_mod)
-```
-```{r, eval=FALSE, results='asis'}
-tidy(score_mod)
-```
+
 ```{r, echo = FALSE, fig.show = 'hide'}
 data_set %>% 
   ggplot(aes(migration_rate, gdp_growth_rate)) +
   geom_point() +
   geom_smooth(method = "lm") +
-  theme_minimal()
+  theme_minimal() 
+
 ```
 
-
-```{r, eval=FALSE, results='asis'}
-library(kableExtra)
-library(knitr)
-
+```{r, echo = FALSE, fig.show = 'hide'}
 data_set %>% 
-  filter(country %in% c("Argentina", "Australia", "Belarus", "Uganda", "Canada", "Japan")) %>% 
-  pairwise_t_test(migration_rate ~ country, 
-                  pool.sd = FALSE,
-                  p.adjust.method = "bonferroni") %>% 
-  kbl(caption = "Recreating Style Table") %>%
-  kable_classic(html_font = "Alrai")
-knitr::kable(iris2, format = "latex", booktabs = TRUE)
+  ggplot(aes(gdp_growth_rate, total_unemployment_rate)) +
+  geom_point() +
+  geom_smooth(method = "lm") +
+  theme_minimal() 
 
 ```
-
-
-
-
- 
-
-
 
 \newpage
 # References {#references}
